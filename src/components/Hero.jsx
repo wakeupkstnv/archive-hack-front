@@ -43,7 +43,7 @@ const Hero = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.4 }}
         >
-          Photo Restore breathes new life into your cherished memories. Our AI technology repairs scratches, restores colors, and enhances details, bringing your old photos back to their original glory.
+          Document Restore transforms your scanned documents into high-quality PDFs. Our AI technology removes imperfections, enhances clarity, and preserves every detail, delivering a flawless and professional document ready for use.
         </motion.p>
         
         <motion.div

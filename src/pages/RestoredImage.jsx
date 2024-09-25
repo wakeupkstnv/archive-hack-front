@@ -7,9 +7,7 @@ const RestoredImage = () => {
   const location = useLocation();
   const [restoredData, setRestoredData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const { imageUrl } = location.state || {};
-
-
+  const { imageUrl, link } = location.state || {};  // Извлекаем link из location.state
 
   useEffect(() => {
     const fetchRestoredData = async () => {
@@ -26,20 +24,17 @@ const RestoredImage = () => {
     fetchRestoredData();
   }, [location.state]);
 
-  const handleDownload = async () => {
-    try {
-      const response = await axios.get('http://localhost:8000/api/ernur/poka/delaet', {
-        responseType: 'blob',
-      });
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', 'restored-image.jpg');
-      document.body.appendChild(link);
-      link.click();
-    } catch (error) {
-      console.error('Error downloading restored image:', error);
-      alert('An error occurred while downloading the restored image. Please try again.');
+  const handleDownload = () => {
+    if (link) {
+      // Если link передан, используем его для скачивания
+      const a = document.createElement('a');
+      a.href = link;  // Используем переданный link
+      a.setAttribute('download', 'restored-file.pdf');  // Название скачиваемого файла
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    } else {
+      alert('No link available for download');
     }
   };
 
@@ -66,11 +61,11 @@ const RestoredImage = () => {
             <p className="text-base md:text-lg mb-4">Loading...</p>
           ) : (
             <p className="text-base md:text-lg mb-4 max-h-80 overflow-y-auto w-[calc(100%)]">
-            {restoredData?.transformed_text}
+              {restoredData?.transformed_text}
             </p>
           )}
           <button className="bg-[#303030] hover:bg-[#404040] text-white font-bold py-2 px-4 rounded" onClick={handleDownload}>
-            Download Restored Image
+            Download Restored File
           </button>
         </div>
       </section>
@@ -78,7 +73,4 @@ const RestoredImage = () => {
   );
 };
 
-
 export default RestoredImage;
-
-

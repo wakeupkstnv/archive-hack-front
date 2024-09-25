@@ -28,7 +28,6 @@ const Header = () => {
           <nav className="hidden md:flex space-x-6">
             <NavLink to="/">Home</NavLink>
             <NavLink to="/about">About</NavLink>
-            <NavLink to="/pricing">Pricing</NavLink>
           </nav>
           
           <div className="flex items-center space-x-4">

@@ -58,17 +58,40 @@ const UploadForm = () => {
         formData.append('file', selectedFile);
         console.log('Uploading file:', selectedFile);
 
-        const response = await axios.post('http://localhost:8000/api/vision/analyze', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
+        // 1. Загружаем фото на сервер
+        const uploadResponse = await axios.post('http://localhost:8000/api/aws/upload', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
         });
-        
-        console.log('Response data:', response.data);
-        navigate('/restored', { state: { data: response.data, imageUrl:previewUrl } });
+
+        console.log(uploadResponse);
+        const fileUrl = uploadResponse.data;  // Получаем URL загруженного файла
+        console.log('File uploaded. URL:', fileUrl);
+
+        // 2. Используем полученный URL для анализа
+        const analyzeResponse = await axios.get(`http://localhost:8000/api/vision/analyze-url?image_url=${encodeURIComponent(fileUrl)}`, {
+          headers: {
+            'Content-Type': 'application/json',  // Добавьте заголовки, если нужно
+          },
+          responseType: 'arraybuffer'
+        });
+
+        console.log(analyzeResponse);
+        // Преобразуем байты в Blob для создания PDF
+        const pdfBlob = new Blob([analyzeResponse.data], { type: 'application/pdf' });
+
+        // Сохраняем PDF файл
+        const link = document.createElement('a');
+        link.href = window.URL.createObjectURL(pdfBlob);
+        link.download = 'analysis.pdf';
+        link.click();
+
+        // Перенаправляем на другую страницу
+        navigate('/restored', { state: { data: analyzeResponse.data, link: link.href } });
       } catch (error) {
-        console.error('Error uploading image:', error);
-        alert('An error occurred while uploading the image. Please try again.');
+        console.error('Error during upload or analysis:', error);
+        alert('An error occurred while processing the image. Please try again.');
       } finally {
         setIsLoading(false);
       }
